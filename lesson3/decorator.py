@@ -18,7 +18,7 @@ def my_own_decorator(call_number=1):
                 initial_time = time()
                 result.append(func())
                 time_execute = time() - initial_time
-                print(f'Function {func.__name__}() executed {i+1} time in {time_execute}')
+                print(f'Function {func.__name__}() executed {i + 1} time in {time_execute}')
 
             return result
 
