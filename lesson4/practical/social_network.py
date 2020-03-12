@@ -1,24 +1,27 @@
 from datetime import date, timedelta
 from random import randint
 
+
 class AdminCounterException(Exception):
     pass
+
 
 class UserAlreadyExists(Exception):
     pass
 
+
 class WrongUsernameOrPassword(Exception):
     pass
 
-class User:
 
+class User:
     user_dict = {}
 
     def __init__(self, username, password, is_admin=False):
         self._username = username.lower()
         self._password = password
         self._is_admin = is_admin
-        self._registration_date = date.today() - timedelta(randint(0,1000))
+        self._registration_date = date.today() - timedelta(randint(0, 1000))
         self._posts = []
 
         if not is_admin and not User.user_dict:
@@ -52,9 +55,12 @@ class User:
 
             print(which_user)
             which_user = User.user_dict.get(which_user)
+
             if which_user:
+
                 for post in which_user.posts:
                     print(post, end='\n\n')
+
             print('\n\n')
 
         elif self.is_admin:
@@ -70,11 +76,12 @@ class User:
     def see_user_list(self):
 
         if self.is_admin:
+
             for val in User.user_dict.values():
                 print(val.username, val.registration_date)
+
         else:
             print(self.username, self.registration_date)
-
 
 
 class SocialNetwork:
@@ -82,21 +89,33 @@ class SocialNetwork:
     def register_user(self):
 
         if User.user_dict:
+
             register_str = 'Enter desired username: '
             is_admin = False
+
         else:
+
             register_str = 'Enter admin login: '
             is_admin = True
 
         while True:
+
             username = input(register_str).strip().lower()
             if User.user_dict.get(username):
                 print('Such user already exists in network')
                 continue
+
             break
 
         while True:
-            password = input('Enter password: ')
+
+            password = input('Type password: ')
+
+            if password != input('Retype password: '):
+
+                print('You did not retype password')
+                continue
+
             if not self.check_password_complexity(password):
                 print('Password should consist of:\n    at least 8 characters and\n\
     a minimum of 1 lower case letter [a-z] and\n\
@@ -104,16 +123,20 @@ class SocialNetwork:
     a minimum of 1 numeric character [0-9] and\n\
     a minimum of 1 special character: !#$%&"() *+,-./:;<=>?@[\]^_`{|}~\'')
                 continue
+
             break
 
         try:
+
             User.user_dict[username] = User(username, password, is_admin)
+
         except AdminCounterException as err:
+
             print(err)
 
     def authenticate(self, username, password):
 
-        user  = User.user_dict.get(username)
+        user = User.user_dict.get(username.strip().lower())
 
         if not (user and user.check_password(password)):
             raise WrongUsernameOrPassword('Wrong username or password')
@@ -132,34 +155,42 @@ class SocialNetwork:
             password_strength = True
 
         for s in lower_alphabet:
+
             if password_strength and s in password:
                 break
             elif not password_strength:
                 break
+
         else:
             password_strength = False
 
         for s in upper_alphabet:
+
             if password_strength and s in password:
                 break
             elif not password_strength:
                 break
+
         else:
             password_strength = False
 
         for s in special_characters:
+
             if password_strength and s in password:
                 break
             elif not password_strength:
                 break
+
         else:
             password_strength = False
 
         for s in numbers:
+
             if password_strength and s in password:
                 break
             elif not password_strength:
                 break
+
         else:
             password_strength = False
 
@@ -171,7 +202,7 @@ class SNPost:
     def __init__(self):
 
         self._content = input('You are creating post. What\'s on your mind?: ')
-        self._date = date.today() - timedelta(randint(0,1000))
+        self._date = date.today() - timedelta(randint(0, 1000))
 
     def __str__(self):
         return f'{self._date}\n{self._content}'
