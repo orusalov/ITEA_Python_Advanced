@@ -12,19 +12,16 @@ class WrongUsernameOrPassword(Exception):
 
 class User:
 
-    admin_counter = 0
+    user_dict = {}
 
     def __init__(self, username, password, is_admin=False):
         self._username = username.lower()
         self._password = password
         self._is_admin = is_admin
         self._registration_date = date.today() - timedelta(randint(0,1000))
+        self._posts = []
 
-        if is_admin and not User.admin_counter:
-            User.admin_counter += 1
-        elif is_admin and User.admin_counter:
-            raise AdminCounterException('Network already has admin')
-        elif not is_admin and not User.admin_counter:
+        if not is_admin and not User.user_dict:
             raise AdminCounterException('Network first user has to be admin')
 
     @property
@@ -33,20 +30,58 @@ class User:
 
     @property
     def is_admin(self):
-        return self.is_admin
+        return self._is_admin
+
+    @property
+    def registration_date(self):
+        return self._registration_date
+
+    @property
+    def posts(self):
+        return self._posts
 
     def check_password(self, value):
         return True if self._password == value else False
 
+    def create_post(self):
+        self._posts.append(SNPost())
+
+    def see_posts(self, which_user=None):
+
+        if self.is_admin and which_user:
+
+            print(which_user)
+            which_user = User.user_dict.get(which_user)
+            if which_user:
+                for post in which_user.posts:
+                    print(post, end='\n\n')
+            print('\n\n\n')
+
+        elif self.is_admin:
+
+            for username in User.user_dict:
+                self.see_posts(username)
+
+        else:
+
+            for post in self.posts:
+                print(post, end='\n\n')
+
+    def see_user_list(self):
+
+        if self.is_admin:
+            for val in User.user_dict.values():
+                print(val.username, val.registration_date)
+        else:
+            print(self.username, self.registration_date)
+
+
 
 class SocialNetwork:
 
-    def __init__(self):
-        self.user_dict = {}
-
     def register_user(self):
 
-        if self.user_dict:
+        if User.user_dict:
             register_str = 'Enter desired username: '
             is_admin = False
         else:
@@ -55,7 +90,7 @@ class SocialNetwork:
 
         while True:
             username = input(register_str).strip().lower()
-            if self.user_dict.get(username):
+            if User.user_dict.get(username):
                 print('Such user already exists in network')
                 continue
             break
@@ -72,13 +107,13 @@ class SocialNetwork:
             break
 
         try:
-            self.user_dict[username] = User(username, password, is_admin)
+            User.user_dict[username] = User(username, password, is_admin)
         except AdminCounterException as err:
             print(err)
 
     def authenticate(self, username, password):
 
-        user  = self.user_dict.get(username)
+        user  = User.user_dict.get(username)
 
         if not (user and user.check_password(password)):
             raise WrongUsernameOrPassword('Wrong username or password')
@@ -131,8 +166,76 @@ class SocialNetwork:
         return password_strength
 
 
-sn = SocialNetwork()
+class SNPost:
 
-sn.register_user()
+    def __init__(self):
 
-user = sn.authenticate(input('login:'), input('password: '))
+        self._content = input('You are creating post. What\'s on your mind?: ')
+        self._date = date.today() - timedelta(randint(0,1000))
+
+    def __str__(self):
+        return f'{self._date}\n{self._content}'
+
+
+def main():
+
+    sn = SocialNetwork()
+    sn.register_user()
+
+    # Main loop
+    while True:
+        choise = input('You want to login(1), register(2) or exit(3)?: ').strip()
+        if choise not in set('123'):
+
+            print('Wrong input!')
+            continue
+
+        elif choise == '3':
+
+            print('Goodbye!!!')
+            break
+
+        elif choise == '2':
+
+            sn.register_user()
+            continue
+
+        elif choise == '1':
+
+            try:
+                user = sn.authenticate(input('login: '), input('password: '))
+            except WrongUsernameOrPassword as err:
+                print(err)
+                continue
+
+        while True:
+
+            choise = input('You want to see_user_list(1), create_post(2), see_posts(3) or exit(4)?: ').strip()
+            if choise not in set('1234'):
+
+                print('Wrong input!')
+                continue
+
+            elif choise == '4':
+
+                print('Goodbye!!!')
+                break
+
+            elif choise == '3':
+
+                user.see_posts()
+                continue
+
+            elif choise == '2':
+
+                user.create_post()
+                continue
+
+            elif choise == '1':
+
+                user.see_user_list()
+                continue
+
+
+if __name__ == '__main__':
+    main()
