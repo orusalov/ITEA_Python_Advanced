@@ -55,7 +55,7 @@ class User:
             if which_user:
                 for post in which_user.posts:
                     print(post, end='\n\n')
-            print('\n\n\n')
+            print('\n\n')
 
         elif self.is_admin:
 
