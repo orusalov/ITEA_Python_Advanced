@@ -6,7 +6,7 @@ class ComplexNumbers:
 
     def __str__(self):
         return f'{self.rational} {"-" if self.irrational < 0 else "+"} \
-{str(abs(self.irrational))+"i" if self.irrational !=0 else None}'
+{str(abs(self.irrational)) + "i" if self.irrational != 0 else None}'
 
     def __pos__(self):
         return self
@@ -18,8 +18,10 @@ class ComplexNumbers:
 
         if isinstance(other, (int, float)):
             return ComplexNumbers(self.rational + other, self.irrational)
+
         elif isinstance(other, ComplexNumbers):
             return ComplexNumbers(self.rational + other.rational, self.irrational + other.irrational)
+
         else:
             raise TypeError('expected int, float or ComplexNumbers')
 
@@ -27,8 +29,10 @@ class ComplexNumbers:
 
         if isinstance(other, (int, float)):
             return ComplexNumbers(self.rational - other, self.irrational)
+
         elif isinstance(other, ComplexNumbers):
             return ComplexNumbers(self.rational - other.rational, self.irrational - other.irrational)
+
         else:
             raise TypeError('expected int, float or ComplexNumbers')
 
@@ -36,9 +40,12 @@ class ComplexNumbers:
 
         if isinstance(other, (int, float)):
             return ComplexNumbers(self.rational * other, self.irrational * other)
+
         elif isinstance(other, ComplexNumbers):
+
             return ComplexNumbers(self.rational * other.rational - self.irrational * other.irrational,
                                   self.rational * other.irrational + self.irrational * other.rational)
+
         else:
             raise TypeError('expected int, float or ComplexNumbers')
 
@@ -46,10 +53,13 @@ class ComplexNumbers:
 
         if isinstance(other, (int, float)):
             return ComplexNumbers(self.rational / other, self.irrational / other)
+
         elif isinstance(other, ComplexNumbers):
+
             mul = self * ComplexNumbers(other.rational, -other.irrational)
             div = other.irrational ** 2 + other.irrational ** 2
             return mul / div
+
         else:
             raise TypeError('expected int, float or ComplexNumbers')
 
@@ -60,7 +70,6 @@ class ComplexNumbers:
             result *= self
 
         return result
-
 
 
 print(ComplexNumbers(5, 7) + 2)
