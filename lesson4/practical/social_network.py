@@ -6,10 +6,6 @@ class AdminCounterException(Exception):
     pass
 
 
-class UserAlreadyExists(Exception):
-    pass
-
-
 class WrongUsernameOrPassword(Exception):
     pass
 
