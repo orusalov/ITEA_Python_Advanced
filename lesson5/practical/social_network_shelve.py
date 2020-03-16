@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from random import randint
-
+import shelve
 
 class AdminCounterException(Exception):
     pass
@@ -13,11 +13,17 @@ class WrongUsernameOrPassword(Exception):
 class User:
     user_dict = {}
 
-    def __init__(self, username, password, is_admin=False):
-        self._username = username.lower()
+    def __init__(
+            self,
+            username,
+            password,
+            is_admin=False,
+            registration_date=date.today() - timedelta(randint(0, 1000))
+    ):
+        self._username = username.lower().strip()
         self._password = password
         self._is_admin = is_admin
-        self._registration_date = date.today() - timedelta(randint(0, 1000))
+        self._registration_date = registration_date
         self._posts = []
 
         if not is_admin and not User.user_dict:
@@ -82,6 +88,33 @@ class User:
 
 class SocialNetwork:
 
+    PWD_LOWER_ALPHABET = set('abcdefghijklmnopqrstuvwxyz')
+    PWD_UPPER_ALPHABET = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    PWD_NUMBERS = set('0123456789')
+    PWD_SPECIAL_CHARACTERS = set('!#$%&"()*+,-./:;<=>?@[\]^_`{}~\'')
+    PWD_INVALID_CHARS = set(' |')
+
+    def load(self, filename):
+        with shelve.open(filename) as user_dict_shelve:
+            for user, attributes in user_dict_shelve.items():
+                parts = attributes.split('|')
+                registration_date = parts[3].split('-')
+                registration_date = [int(i) for i in registration_date]
+                print(user, parts[1], parts[2] == 'True', date(*registration_date))
+                User.user_dict[user] = User(user, parts[1], parts[2] == 'True', date(*registration_date))
+
+
+    def save(self, filename):
+        with shelve.open(filename) as user_dict_shelve:
+            for user, attributes in User.user_dict.items():
+                parts = '|'.join([
+                    attributes.username,
+                    attributes._password,
+                    str(attributes.is_admin),
+                    str(attributes.registration_date)
+                ])
+                user_dict_shelve[user] = parts
+
     def register_user(self):
 
         if User.user_dict:
@@ -113,11 +146,11 @@ class SocialNetwork:
                 continue
 
             if not self.check_password_complexity(password):
-                print('Password should consist of:\n    at least 8 characters and\n\
+                print(f'Password should consist of:\n    at least 8 characters and\n\
     a minimum of 1 lower case letter [a-z] and\n\
     a minimum of 1 upper case letter [A-Z] and\n\
     a minimum of 1 numeric character [0-9] and\n\
-    a minimum of 1 special character: !#$%&"() *+,-./:;<=>?@[\]^_`{|}~\'')
+    a minimum of 1 special character: {"".join(self.PWD_INVALID_CHARS)}')
                 continue
 
             break
@@ -141,16 +174,11 @@ class SocialNetwork:
 
     def check_password_complexity(self, password):
 
-        lower_alphabet = set('abcdefghijklmnopqrstuvwxyz')
-        upper_alphabet = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-        numbers = set('0123456789')
-        special_characters = set(' !#$%&"()*+,-./:;<=>?@[\]^_`{|}~\'')
-
         password_strength = False
         if len(password) >= 8:
             password_strength = True
 
-        for s in lower_alphabet:
+        for s in self.PWD_LOWER_ALPHABET:
 
             if password_strength and s in password:
                 break
@@ -160,7 +188,7 @@ class SocialNetwork:
         else:
             password_strength = False
 
-        for s in upper_alphabet:
+        for s in self.PWD_UPPER_ALPHABET:
 
             if password_strength and s in password:
                 break
@@ -170,7 +198,7 @@ class SocialNetwork:
         else:
             password_strength = False
 
-        for s in special_characters:
+        for s in self.PWD_SPECIAL_CHARACTERS:
 
             if password_strength and s in password:
                 break
@@ -180,7 +208,7 @@ class SocialNetwork:
         else:
             password_strength = False
 
-        for s in numbers:
+        for s in self.PWD_NUMBERS:
 
             if password_strength and s in password:
                 break
@@ -189,6 +217,14 @@ class SocialNetwork:
 
         else:
             password_strength = False
+
+        for s in self.PWD_INVALID_CHARS:
+
+            if password_strength and s in password:
+                password_strength = False
+                break
+            elif not password_strength:
+                break
 
         return password_strength
 
@@ -207,7 +243,10 @@ class SNPost:
 def main():
 
     sn = SocialNetwork()
-    sn.register_user()
+
+    USER_DICT_FILE = 'user_dict_file'
+    sn.load(USER_DICT_FILE)
+
 
     # Main loop
     while True:
@@ -219,6 +258,7 @@ def main():
 
         elif choise == '3':
 
+            sn.save(USER_DICT_FILE)
             print('Goodbye!!!')
             break
 
