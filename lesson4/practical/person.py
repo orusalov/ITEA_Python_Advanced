@@ -65,9 +65,6 @@ class Person(ABC):
 
 class Enrollee(Person):
 
-    def __init__(self, surname, birth_date, faculty):
-        super().__init__(surname, birth_date, faculty)
-
     def get_age(self):
         return super().get_age()
 
