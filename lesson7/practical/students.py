@@ -113,15 +113,16 @@ class User:
                                             ),academic_group_id
                                            )
             where students_card = ?
-                and student_name <> coalesce(?, student_name)
-                and student_surname <> coalesce(?, student_surname)
-                and academic_group_id <> coalesce((SELECT
+                and (student_name <> coalesce(?, student_name)
+                or student_surname <> coalesce(?, student_surname)
+                or academic_group_id <> coalesce((SELECT
                                                      ag.id
                                                   from academic_group ag join faculty f on ag.faculty_id = f.id
                                                   where f.faculty_name=?
                                                     and ag.academic_group_name=?
                                                 ),academic_group_id
                                                )
+                    )
             """
 
         self._execute_dml_(sql, params)
