@@ -44,7 +44,6 @@ class User:
     def is_admin(self):
         return self._is_admin
 
-    @check_is_admin
     def _execute_dml_(self, sql, params):
         with MyDBContextManager(self.STUDENTS_DB) as conn:
             cursor = conn.cursor()
@@ -52,6 +51,7 @@ class User:
             conn.commit()
             return cursor.lastrowid
 
+    @check_is_admin
     def add_mark(self, students_card, mark):
         params = students_card, mark
 
@@ -66,6 +66,7 @@ class User:
 
         self._execute_dml_(sql, params)
 
+    @check_is_admin
     def add_student(self, student_name, student_surname, faculty, group_name):
         params = student_name, student_surname, faculty, group_name
 
@@ -88,6 +89,7 @@ class User:
         id = self._execute_dml_(sql, params)
         return self._get_students_list(student_id=id)[1][0][2]
 
+    @check_is_admin
     def change_student(self, students_card, student_name=None, student_surname=None, faculty=None, group_name=None):
         params = (
             student_name,
