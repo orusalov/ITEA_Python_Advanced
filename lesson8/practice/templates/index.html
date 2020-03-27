@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{page_title}}</title>
-</head>
-<body>
-    <h1>Список товаров</h1>
-    <h2>Привет, {{name}}</h2>
-    <h3>вдлодфів</h3>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}
+{{page_title}}
+{% endblock %}
+
+{% block content %}
+<a href="categories"><h1>user</h1></a>
+<a href="admin"><h1>admin</h1></a>
+{% endblock %}

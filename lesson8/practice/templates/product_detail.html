@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}
+{{page_title}}
+{% endblock %}
+
+{% block content %}
+{% for row in data %}
+<h1>{{row.product_name}}</h1><br>
+<text>Price: {{row.price/100}}</text><br>
+<text>Count in Market: {{row.count_in_market}}</text><br>
+<text>Count in stock: {{row.count_in_warehouse}}</text><br>
+<text>Overall count: {{row.overall_count}} </text><br>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}
+{{page_title}}
+{% endblock %}
+
+{% block content %}
+{% for row in data %}
+<a href="/categories/{{row.category_name}}"><h1>{{row.category_name}}</h1></a>
+{% endfor %}
+{% endblock %}
