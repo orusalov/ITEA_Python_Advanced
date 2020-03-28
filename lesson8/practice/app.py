@@ -36,10 +36,15 @@ def categories_and_products(category_name=None, product_name=None):
 def add_product():
 
     user = User(is_admin=True)
+    page_title = 'Adding Product'
 
     if request.method == 'GET':
         data = user.get_categories()
-        return render_template('add_product.html', categories=data)
+        return render_template(
+            'add_product.html',
+            page_title=page_title,
+            categories=data
+        )
     elif request.method == 'POST':
         dict_values = request.form.to_dict()
         for k, v in dict_values.items():
@@ -49,24 +54,38 @@ def add_product():
         user.add_product(**dict_values)
 
         data = user.get_categories()
-        return render_template('add_product.html', categories=data, successfully_added='Successfully Added')
-        # return request.form.to_dict()
+        return render_template(
+            'add_product.html',
+            page_title=page_title,
+            categories=data,
+            successfully_added='Successfully Added'
+        )
 
 @app.route('/add_product/add_category', methods=['POST', 'GET'])
 def add_new_category():
 
     user = User(is_admin=True)
+    page_title = 'Adding Category'
 
     if request.method == 'GET':
         data = user.get_categories()
-        return render_template('add_category.html', categories=data)
+        return render_template(
+            'add_category.html',
+            page_title=page_title,
+            categories=data
+        )
     elif request.method == 'POST':
         dict_values = request.form.to_dict()
 
         user.add_category(**dict_values)
 
         data = user.get_categories()
-        return render_template('add_category.html', categories=data, successfully_added='Successfully Added')
+        return render_template(
+            'add_category.html',
+            page_title=page_title,
+            categories=data,
+            successfully_added='Successfully Added'
+        )
 
 
 if __name__ == '__main__':
