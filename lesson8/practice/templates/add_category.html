@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+{{page_title}}
+{% endblock %}
+
+{% block content %}
+<a href="/add_product">Back to adding products</a><br><br>
+<form action="/add_product/add_category" method="post">
+    <label for="name">Insert new category:</label>
+    <input type="text" id="name" name="category_name">
+    <input type="submit"><br>
+</form>
+<h3>{{successfully_added}}</h3><br>
+
+    <h1>Categories:</h1><br>
+    {% for row in categories %}
+        <h3>{{row.category_name}}</h3><br>
+    {% endfor %}
+
+{% endblock %}

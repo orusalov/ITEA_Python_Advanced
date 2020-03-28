@@ -4,7 +4,8 @@
 {% endblock %}
 
 {% block content %}
+<a href="/">Back to start</a><br><br>
 {% for row in data %}
-<a href="/categories/{{row.category_name}}"><h1>{{row.category_name}}</h1></a>
+    <a href="/categories/{{row.category_name}}"><h1>{{row.category_name}}</h1></a>
 {% endfor %}
 {% endblock %}

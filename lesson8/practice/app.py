@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask
+from flask import render_template, request, jsonify
 from db_model import User
 
 app = Flask(__name__)
@@ -31,19 +32,42 @@ def categories_and_products(category_name=None, product_name=None):
 
         return render_template('product_detail.html', page_title=page_title, category_name=category_name, data=data)
 
+@app.route('/add_product', methods=['POST', 'GET'])
+def add_product():
 
-# @app.route('/posts')
-# @app.route('/posts/<int:post_id>')
-# def posts(post_id=None):
-#
-#     if post_id:
-#         return render_template('postbody.html', post=POSTS[post_id - 1])
-#
-#     return render_template('posts.html', posts=POSTS)
+    user = User(is_admin=True)
 
-# @app.route('/posts')
-# def posts():
-#     return render_template('posts.html', posts=POSTS)
+    if request.method == 'GET':
+        data = user.get_categories()
+        return render_template('add_product.html', categories=data)
+    elif request.method == 'POST':
+        dict_values = request.form.to_dict()
+        for k, v in dict_values.items():
+            if k != 'product_name':
+                dict_values[k] = int(float(v)*100) if k == 'price' else int(v)
+
+        user.add_product(**dict_values)
+
+        data = user.get_categories()
+        return render_template('add_product.html', categories=data, successfully_added='Successfully Added')
+        # return request.form.to_dict()
+
+@app.route('/add_product/add_category', methods=['POST', 'GET'])
+def add_new_category():
+
+    user = User(is_admin=True)
+
+    if request.method == 'GET':
+        data = user.get_categories()
+        return render_template('add_category.html', categories=data)
+    elif request.method == 'POST':
+        dict_values = request.form.to_dict()
+
+        user.add_category(**dict_values)
+
+        data = user.get_categories()
+        return render_template('add_category.html', categories=data, successfully_added='Successfully Added')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

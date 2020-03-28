@@ -4,7 +4,10 @@
 {% endblock %}
 
 {% block content %}
-{% for row in data %}
-<a href="/categories/{{category_name}}/{{row.product_name}}"><h1>{{row.product_name}}</h1></a>
-{% endfor %}
+    <a href="/categories">Back to categories</a><br><br>
+    {% for row in data %}
+        {% if row.overall_count > 0 %}
+            <a href="/categories/{{category_name}}/{{row.product_name}}"><h1>{{row.product_name}}</h1></a>
+        {% endif %}
+    {% endfor %}
 {% endblock %}

@@ -24,7 +24,8 @@ sql_dict = dict(
                                         and product_name = ?',
     select_products_by_category_name='select\
                                             id,\
-                                            product_name\
+                                            product_name,\
+                                            count_in_market + count_in_warehouse overall_count\
                                         from product\
                                         where category_id = (select id from category where category_name = ?)',
     select_categories='select\
@@ -32,5 +33,5 @@ sql_dict = dict(
                          category_name\
                        from category\
                        where category_name = coalesce(?, category_name)\
-                       order by case when id=0 then \'zzzzzzzzzz\' else category_name end'
+                       order by case when id=0 then \'яяяяяяяяяяя\' else category_name end'
 )

@@ -72,7 +72,7 @@ class User:
     @check_is_admin
     def add_category(self, category_name):
 
-        params = category_name
+        params = (category_name,)
         sql = sql_dict['insert_category']
 
         self._execute_dml_(sql, params)
@@ -80,7 +80,7 @@ class User:
     @check_is_admin
     def add_product(self, category_id, product_name, price, count_in_market, count_in_warehouse):
 
-        params = category_id, product_name, price, c, count_in_warehouse
+        params = category_id, product_name, price, count_in_market, count_in_warehouse
 
         sql = sql_dict['insert_product']
 

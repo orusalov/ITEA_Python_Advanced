@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}
+{{page_title}}
+{% endblock %}
+
+{% block content %}
+<a href="/">Back to start</a>   <a href="add_product/add_category">Add new category</a><br><br>
+<form action="/add_product" method="post">
+    <label for="categories">Choose a category:</label>
+    <select id="categories" name="category_id">
+        {% for row in categories %}
+            <option value="{{row.id}}" {% if row.id == 0 %}selected{% endif %}>{{row.category_name}}</option>
+        {% endfor %}
+    </select>
+    <label for="name">Product Name:</label>
+    <input type="text" id="name" name="product_name">
+    <label for="price">Price:</label>
+    <input type="number" step="0.01" id="price" name="price" min="0">
+    <label for="quantity_mrkt">Quantity in market:</label>
+    <input type="number" id="quantity_mrkt" name="count_in_market" min="0">
+    <label for="quantity_stck">Quantity in Stock:</label>
+    <input type="number" id="quantity_stck" name="count_in_warehouse" min="0"><br>
+    <br>
+    <input type="submit" ><br>
+</form>
+<h3>{{successfully_added}}</h3><br>
+
+{% endblock %}
