@@ -63,7 +63,7 @@ class CustomList:
         if index is None:
             index = next(self._current_index_generator)
 
-        if index < -len(self):
+        if index < -len(self) or index > len(self) - 1:
             raise IndexError('CustomList index out of range')
         elif index < 0:
             index = len(self) + index
@@ -74,7 +74,7 @@ class CustomList:
         if isinstance(index, slice):
             return self._attr_slice(index.start, index.stop, index.step)
 
-        if index < -len(self):
+        if index < -len(self) or index > len(self) - 1:
             raise IndexError(f'{self.__class__.__name__} index out of range')
         elif index < 0:
             index = len(self) + index
@@ -82,7 +82,7 @@ class CustomList:
         return getattr(self, f'_attr_{index}')
 
     def __delitem__(self, key):
-        if key < -len(self):
+        if key < -len(self) or key > len(self) - 1:
             raise IndexError(f'{self.__class__.__name__} index out of range')
         elif key < 0:
             key = len(self) + key
@@ -208,5 +208,10 @@ if __name__ == '__main__':
     print(cL3)
     print(cL3.pop(1))
     print(cL3)
+    print(cL3[1],cL3[-4])
+    print(cL3[::-2])
+    print(cL3[1:100])
     print(cL3.clear())
     print(cL3)
+    print(cL3[2])
+
