@@ -1,105 +1,91 @@
-class CustomList:
-    def __init__(self, *args):
-        self._current_length, self._iterator_index = 0, 0
-        self._current_index_generator = self._indexing()
-        for arg in args:
-            self.__setitem__(None, arg)
+class CustomListIter:
 
-    def pop(self):
-
-        return_value = self[-1]
-        del self[-1]
-        return return_value
-
-    def append(self, value):
-        self.__setitem__(None, value)
-
-    def insert(self, index):
-        for atr in self[index::-1]:
-            pass
-
-
-    def remove(self):
-        pass
-
-    def clear(self):
-        pass
-
-    def __setitem__(self, index, value):
-        if index is None:
-            index = next(self._current_index_generator)
-
-        setattr(self, f'_attr_{index}', value)
-
-    def __getitem__(self, index):
-        if isinstance(index, slice):
-            return self._attr_slice(index.start,index.stop,index.step)
-
-        if -self._current_length <= index < 0:
-            index = self._current_length + index
-        elif index < 0:
-            raise IndexError('CustomList index out of range')
-
-        return getattr(self, f'_attr_{index}')
-
-    def _indexing(self):
-        while True:
-            self._current_length += 1
-            yield self._current_length - 1
+    def __init__(self, cust_list):
+        self._instance = cust_list
+        self._iterator_index = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self._iterator_index < self._current_length:
+        if self._iterator_index < len(self._instance):
             self._iterator_index += 1
-            return self[self._iterator_index - 1]
+            return self._instance[self._iterator_index - 1]
 
         self._iterator_index = 0
         raise StopIteration()
 
-    def _attr_slice(self, start, end, step):
-        if step < 0:
-            current_index = -1 if not start else start
-            end = -self._current_length - 1 if not end else end
-        elif step > 0:
-            current_index = 0 if not start else start
-            end = self._current_length - 1 if not end else end
 
-        step = 1 if not step else step
+class CustomList:
+    def __init__(self, *args):
+        self._current_length = 0
+        self._current_index_generator = self._indexing()
+        for arg in args:
+            self.__setitem__(None, arg)
 
-        if current_index < 0:
-            current_index = self._current_length + current_index
+    def pop(self, index=-1):
 
-        if end < 0:
-            end = self._current_length + end
+        return_value = self[index]
+        del self[index]
+        return return_value
 
-        return_val = CustomList()
+    def append(self, object):
+        self.__setitem__(None, object)
 
-        if end > current_index:
-            low_marg = current_index
-            high_marg = end - 1
-        elif end < current_index:
-            low_marg = end + 1
-            high_marg = current_index
-        else:
-            return return_val
+    def insert(self, index, object):
+        idx_rng = range(len(self[index:]))
+        self.append(object)
+        for idx in idx_rng:
+            self[-idx - 1], self[-idx - 2] = self[-idx - 2], self[-idx - 1]
 
-        low_marg = 0 if low_marg < 0 else low_marg
-        high_marg = len(self) - 1 if high_marg >= len(self) else high_marg
+    def remove(self, object):
+        for i in range(len(self)):
+            if self[i] == object:
+                del self[i]
+                break
 
+    def clear(self):
+        for i in range(len(self)):
+            del self[-1]
 
-        while low_marg <= current_index <= high_marg:
-            return_val.__setitem__(None,self[current_index])
-            current_index += step
+    def __add__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError(f'sum allowed only for two {self.__class__.__name__} instances')
 
-        return return_val
+        return_list = self[0:]
+
+        for el in other:
+            return_list.append(el)
+
+        return return_list
+
+    def __setitem__(self, index, value):
+        if index is None:
+            index = next(self._current_index_generator)
+
+        if index < -len(self):
+            raise IndexError('CustomList index out of range')
+        elif index < 0:
+            index = len(self) + index
+
+        setattr(self, f'_attr_{index}', value)
+
+    def __getitem__(self, index):
+        if isinstance(index, slice):
+            return self._attr_slice(index.start, index.stop, index.step)
+
+        if index < -len(self):
+            raise IndexError(f'{self.__class__.__name__} index out of range')
+        elif index < 0:
+            index = len(self) + index
+
+        return getattr(self, f'_attr_{index}')
 
     def __delitem__(self, key):
-        if -self._current_length <= key < 0:
-            key = self._current_length + key
+        if key < -len(self):
+            raise IndexError(f'{self.__class__.__name__} index out of range')
         elif key < 0:
-            raise IndexError('CustomList index out of range')
+            key = len(self) + key
 
         k = key
         for atr in self[key + 1:]:
@@ -108,6 +94,83 @@ class CustomList:
 
         self._current_length -= 1
         delattr(self, f'_attr_{self._current_length}')
+
+    def _indexing(self):
+        while True:
+            self._current_length += 1
+            yield self._current_length - 1
+
+    def __iter__(self):
+        return CustomListIter(self)
+
+    def _attr_slice(self, start, end, step):
+        if step is None:
+            step = 1
+        elif step == 0:
+            raise ValueError('slice step cannot be zero')
+
+        return_val = CustomList()
+
+        if step < 0:
+            if start is None:
+                current_index = len(self) - 1
+            elif start < -len(self):
+                return return_val
+            elif start < 0:
+                current_index = len(self) + start
+            elif start >= len(self) - 1:
+                current_index = len(self) - 1
+            elif start >= 0:
+                current_index = start
+
+            if end is None:
+                end = 0
+            elif end < -len(self):
+                end = 0
+            elif end < 0:
+                end = len(self) + end + 1
+            elif end >= len(self) - 1:
+                return return_val
+            elif end >= 0:
+                end = end + 1
+
+            if end > current_index:
+                return return_val
+
+        elif step > 0:
+            if start is None:
+                current_index = 0
+            elif start >= len(self):
+                return return_val
+            elif start >= 0:
+                current_index = start
+            elif start < -len(self):
+                current_index = 0
+            elif start < 0:
+                current_index = len(self) + start
+
+            if end is None:
+                end = len(self) - 1
+            elif end >= len(self):
+                end = len(self) - 1
+            elif end >= 0:
+                end = end - 1
+            elif end < -len(self):
+                return return_val
+            elif end < 0:
+                end = len(self) + end - 1
+
+            if end < current_index:
+                return return_val
+
+        low_marg = min(current_index, end)
+        high_marg = max(current_index, end)
+
+        while low_marg <= current_index <= high_marg:
+            return_val.__setitem__(None, self[current_index])
+            current_index += step
+
+        return return_val
 
     def __len__(self):
         return self._current_length
@@ -118,32 +181,32 @@ class CustomList:
         return return_str
 
 
+if __name__ == '__main__':
+    cust_list = CustomList('z', 'x', 'c', 'v', 'b')
+    cust_list2 = CustomList('a', 'b', 'c', 'd')
 
+    lis = ['z', 'x', 'c', 'v', 'b']
+    lis2 = ['a', 'b', 'c', 'd']
 
-cust_list = CustomList('z','x','c', 'v')
+    print(cust_list)
+    print(lis)
 
-print(cust_list)
-
-for atr in cust_list:
-    print(atr)
-
-cl1 = cust_list[-10::-1]
-
-print(cl1)
-
-for atr in cl1:
-    print(atr)
-
-#
-# print(cust_list[-2])
-#
-# del cust_list[1]
-#
-# for atr in cust_list:
-#     print(atr)
-
-lis = ['q','w','e','r','t','y']
-del lis[4:]
-print(lis)
-
-print(lis[7:9])
+    cL3 = cust_list + cust_list2
+    print(cL3)
+    print(lis + lis2)
+    cL3.append('qwe')
+    print(cL3)
+    cL3.remove('b')
+    print(cL3)
+    cL3.insert(3, 'qqq')
+    print(cL3)
+    cL3.insert(-3, 'zzzz')
+    print(cL3)
+    print(cL3.pop())
+    print(cL3)
+    print(cL3.pop(-6))
+    print(cL3)
+    print(cL3.pop(1))
+    print(cL3)
+    print(cL3.clear())
+    print(cL3)
