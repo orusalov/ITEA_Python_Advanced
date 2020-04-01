@@ -64,7 +64,7 @@ class CustomList:
             index = next(self._current_index_generator)
 
         if index < -len(self) or index > len(self) - 1:
-            raise IndexError('CustomList index out of range')
+            raise IndexError(f'{self.__class__.__name__} index out of range')
         elif index < 0:
             index = len(self) + index
 
