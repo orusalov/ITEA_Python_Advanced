@@ -20,6 +20,7 @@ class CustomList:
     def __init__(self, *args):
         self._current_length = 0
         self._current_index_generator = self._indexing()
+        self._cust_listt_attr_prefix = '_attr_cust_list_'
         for arg in args:
             self.__setitem__(None, arg)
 
@@ -68,7 +69,7 @@ class CustomList:
         elif index < 0:
             index = len(self) + index
 
-        setattr(self, f'_attr_{index}', value)
+        setattr(self, f'{self._cust_listt_attr_prefix}{index}', value)
 
     def __getitem__(self, index):
         if isinstance(index, slice):
@@ -79,7 +80,7 @@ class CustomList:
         elif index < 0:
             index = len(self) + index
 
-        return getattr(self, f'_attr_{index}')
+        return getattr(self, f'{self._cust_listt_attr_prefix}{index}')
 
     def __delitem__(self, key):
         if key < -len(self) or key > len(self) - 1:
@@ -93,7 +94,7 @@ class CustomList:
             k += 1
 
         self._current_length -= 1
-        delattr(self, f'_attr_{self._current_length}')
+        delattr(self, f'{self._cust_listt_attr_prefix}{self._current_length}')
 
     def _indexing(self):
         while True:
@@ -176,7 +177,12 @@ class CustomList:
         return self._current_length
 
     def __str__(self):
-        els = ', '.join(self)
+        list_str = CustomList()
+
+        sign = "'"
+        for val in self:
+            list_str.append(f"{f'{sign}{val}{sign}' if isinstance(val, str) else str(val)}")
+        els = ', '.join(list_str)
         return_str = f'{self.__class__.__name__}({els})'
         return return_str
 
@@ -213,5 +219,5 @@ if __name__ == '__main__':
     print(cL3[1:100])
     print(cL3.clear())
     print(cL3)
-    print(cL3[2])
+    print(cL3[0])
 
