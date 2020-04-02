@@ -4,7 +4,7 @@ from custom_list import CustomList
 class CustomDictionary:
     def __init__(self, *args, **kwargs):
         self._current_length = 0
-        self._cust_dict_attr_prefix = '_attr_cust_dict_'
+        self._CUST_DICT_ATTR_PREFIX = '_attr_cust_dict_'
         for arg in args:
             self.__setitem__(arg[0], arg[1])
         for k, v in kwargs.items():
@@ -13,7 +13,7 @@ class CustomDictionary:
     def items(self):
         dict_items = CustomList()
         for attr in dir(self):
-            if attr.startswith(self._cust_dict_attr_prefix):
+            if attr.startswith(self._CUST_DICT_ATTR_PREFIX):
                 key, val = getattr(self, attr)
                 dict_items.append((key, val))
 
@@ -60,7 +60,7 @@ class CustomDictionary:
         if not hasattr(key, '__hash__'):
             raise TypeError(f'unhashable type: {type(key).__name__}')
 
-        setattr(self, f'{self._cust_dict_attr_prefix}{key.__hash__()}', (key, value))
+        setattr(self, f'{self._CUST_DICT_ATTR_PREFIX}{key.__hash__()}', (key, value))
         self._current_length += 1
 
     def __getitem__(self, key):
@@ -70,8 +70,8 @@ class CustomDictionary:
         if not hasattr(key, '__hash__'):
             raise TypeError(f'unhashable type: {type(key).__name__}')
 
-        if hasattr(self, f'{self._cust_dict_attr_prefix}{key.__hash__()}'):
-            attr = getattr(self, f'{self._cust_dict_attr_prefix}{key.__hash__()}')
+        if hasattr(self, f'{self._CUST_DICT_ATTR_PREFIX}{key.__hash__()}'):
+            attr = getattr(self, f'{self._CUST_DICT_ATTR_PREFIX}{key.__hash__()}')
         else:
             attr = None
 
@@ -84,11 +84,11 @@ class CustomDictionary:
 
         atr = self[key]  # Just for raising exceptions from getitem
 
-        delattr(self, f'{self._cust_dict_attr_prefix}{key.__hash__()}')
+        delattr(self, f'{self._CUST_DICT_ATTR_PREFIX}{key.__hash__()}')
         self._current_length -= 1
 
     def __iter__(self):
-        return self.keys()
+        return self.keys().__iter__()
 
     def __len__(self):
         return self._current_length

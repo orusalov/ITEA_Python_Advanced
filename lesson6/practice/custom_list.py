@@ -20,7 +20,7 @@ class CustomList:
     def __init__(self, *args):
         self._current_length = 0
         self._current_index_generator = self._indexing()
-        self._cust_listt_attr_prefix = '_attr_cust_list_'
+        self._CUST_LISTT_ATTR_PREFIX = '_attr_cust_list_'
         for arg in args:
             self.__setitem__(None, arg)
 
@@ -69,7 +69,7 @@ class CustomList:
         elif index < 0:
             index = len(self) + index
 
-        setattr(self, f'{self._cust_listt_attr_prefix}{index}', value)
+        setattr(self, f'{self._CUST_LISTT_ATTR_PREFIX}{index}', value)
 
     def __getitem__(self, index):
         if isinstance(index, slice):
@@ -80,7 +80,7 @@ class CustomList:
         elif index < 0:
             index = len(self) + index
 
-        return getattr(self, f'{self._cust_listt_attr_prefix}{index}')
+        return getattr(self, f'{self._CUST_LISTT_ATTR_PREFIX}{index}')
 
     def __delitem__(self, key):
         if key < -len(self) or key > len(self) - 1:
@@ -94,7 +94,7 @@ class CustomList:
             k += 1
 
         self._current_length -= 1
-        delattr(self, f'{self._cust_listt_attr_prefix}{self._current_length}')
+        delattr(self, f'{self._CUST_LISTT_ATTR_PREFIX}{self._current_length}')
 
     def _indexing(self):
         while True:
