@@ -1,6 +1,7 @@
 import requests as r
 from bs4 import BeautifulSoup
 
+
 class Err404(Exception):
     pass
 
@@ -55,6 +56,7 @@ class Weather:
         wd = self.weather['forecast'][day]
         print(wd['date'], wd['sky'], wd['temperature'], sep=', ')
 
+
 if __name__ == '__main__':
     weather = Weather()
 
@@ -66,7 +68,8 @@ if __name__ == '__main__':
             default = False
 
         try:
-            choice = input('Выберите другой день(0-9)* или город(г)\n*0-9: 0 - сегодня, 1 - завтра и т.д\n').lower().strip()
+            choice = input(
+                'Выберите другой день(0-9)* или город(г)\n*0-9: 0 - сегодня, 1 - завтра и т.д\n').lower().strip()
             if len(choice) == 1 and ('0' <= choice <= '9'):
                 weather.print_weather_for_N_day(int(choice))
             elif choice == 'г':
