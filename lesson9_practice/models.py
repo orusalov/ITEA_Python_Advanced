@@ -8,6 +8,14 @@ class Faculty(me.Document):
     faculty_name = me.StringField(min_length=4, max_length=256, unique=True, required=True)
     faculty_abbreviation = me.StringField(min_length=2, max_length=7, unique=True)
 
+    @property
+    def curators(self):
+        return Curator.objects(faculty=self)
+
+    @property
+    def academic_groups(self):
+        return AcademicGroup.objects(faculty=self)
+
     def get_students(self):
         students = []
         for student in Student.objects():

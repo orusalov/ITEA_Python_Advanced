@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from models import Faculty, AcademicGroup, Curator, Student, Mark
+from mongoengine import DoesNotExist, ValidationError as VE
 from schemas import (
     FacultySchema,
     FacultyPutSchema,
@@ -28,7 +29,10 @@ class FacultyResource(Resource):
 
     def get(self, id=None):
         if id:
-            faculty = Faculty.objects.get(id=id)
+            try:
+                faculty = Faculty.objects.get(id=id)
+            except (DoesNotExist, VE):
+                return 'No cuch faculty'
             return FacultySchema().dump(faculty)
         else:
             faculties = Faculty.objects()
@@ -54,15 +58,25 @@ class FacultyResource(Resource):
         faculty.modify(**data)
         return FacultySchema().dump(faculty)
 
-    def delete(self):
-        pass
+    def delete(self, id):
+        faculty = Faculty.objects.get(id=id)
+
+        if faculty.curators or faculty.academic_groups:
+            return 'Faculty can\'t be deleted while has Curators and Academic Groups'
+
+        faculty.delete()
+        return f'Deleted {id}'
 
 
 class AcademicGroupResource(Resource):
 
     def get(self, id=None):
         if id:
-            academic_group = AcademicGroup.objects.get(id=id)
+            try:
+                academic_group = AcademicGroup.objects.get(id=id)
+            except (DoesNotExist, VE):
+                return 'No cuch academic group'
+
             return AcademicGroupSchema().dump(academic_group)
         else:
             academic_groups = AcademicGroup.objects()
@@ -93,15 +107,23 @@ class AcademicGroupResource(Resource):
         a_g.modify(**data)
         return AcademicGroupSchema().dump(a_g)
 
-    def delete(self):
-        pass
+    def delete(self, id):
+        a_g = AcademicGroup.objects.get(id=id)
+        if a_g.students:
+            return 'Academic Group can\'t be deleted while has students'
+
+        a_g.delete()
+        return f'Deleted {id}'
 
 
 class CuratorResource(Resource):
 
     def get(self, id=None):
         if id:
-            curator = Curator.objects.get(id=id)
+            try:
+                curator = Curator.objects.get(id=id)
+            except (DoesNotExist, VE):
+                return 'No cuch curator'
             return CuratorSchema().dump(curator)
         else:
             curators = Curator.objects()
@@ -133,15 +155,23 @@ class CuratorResource(Resource):
         curator.modify(**data)
         return CuratorSchema().dump(curator)
 
-    def delete(self):
-        pass
+    def delete(self, id):
+        curator = Curator.objects.get(id=id)
+        if curator.students:
+            return 'Curator can\'t be deleted while has students'
+
+        curator.delete()
+        return f'Deleted {id}'
 
 
 class StudentResource(Resource):
 
     def get(self, id=None):
         if id:
-            student = Student.objects.get(id=id)
+            try:
+                student = Student.objects.get(id=id)
+            except (DoesNotExist, VE):
+                return 'No cuch student'
             return StudentSchema().dump(student)
         else:
             students = Student.objects()
@@ -263,5 +293,7 @@ class StudentResource(Resource):
 
         return StudentSchema().dump(student)
 
-    def delete(self):
-        pass
+    def delete(self, id):
+        st = Student.objects.get(id=id)
+        st.delete()
+        return f'Deleted {id}'
