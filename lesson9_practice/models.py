@@ -25,7 +25,7 @@ class Faculty(me.Document):
         return students
 
     def get_best_students(self):
-        THRESHOLD = 4.5
+        THRESHOLD = 5
         best_students = []
         for student in self.get_students():
             if student.get_avg_mark() >= THRESHOLD:
