@@ -6,7 +6,7 @@ class Dec:
 
     def __call__(self, *args, **kwargs):
         print(f'wrapping function {self.f.__name__}')
-        self.f()
+        self.f(*args, **kwargs)
 
 
 
